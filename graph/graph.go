@@ -79,26 +79,34 @@ func (g *Graph) RemoveVeticeEdgeReference(v *Vertice) {
 
 // Add Edge to the vertices that reference the givenn vertice
 func (g *Graph) AddVeticeEdgeReference(v *Vertice) *Graph {
+	// Loop through the new vertice edges so
+	// we can update related vertices` edges
 	for _, e := range v.Edges {
-		ed := new(Edge).
+		newEdge := new(Edge).
 			SetWeight(e.Weight).
 			SetAttach(v)
 
-		ed.SetDirection(EDGE_FROM)
-		if e.GetDirection() == EDGE_FROM {
-			ed.SetDirection(EDGE_TO)
+		// Default direction
+		switch e.GetDirection() {
+		case EDGE_FROM:
+			newEdge.SetDirection(EDGE_TO)
+		case EDGE_TO:
+			newEdge.SetDirection(EDGE_FROM)
+		default:
+			newEdge.SetDirection(EDGE_UNDIR)
 		}
 
-		ref := e.GetAttach()
-		exist := false
-		for _, ee := range ref.Edges {
-			if ee.GetDirection() == e.GetDirection() && g.Indexer.Equal(ee.GetAttach(), e.GetAttach()) {
-				exist = true
+		refVertice := e.GetAttach()
+		edgeExist := false
+		for _, ee := range refVertice.Edges {
+			if IsEdgeEqual(ee, newEdge, g.Indexer) {
+				edgeExist = true
+				break
 			}
 		}
 
-		if !exist {
-			ref.Edges = append(ref.Edges, ed)
+		if !edgeExist {
+			refVertice.Edges = append(refVertice.Edges, newEdge)
 		}
 	}
 
@@ -117,9 +125,9 @@ func (g *Graph) UpsertVertice(v *Vertice) *Graph {
 		// Replace the old vertice with the new one
 		g.Vertices[idx] = v
 
-		g.AddVeticeEdgeReference(v)
 	}
 
+	g.AddVeticeEdgeReference(v)
 	return g
 }
 
@@ -254,8 +262,9 @@ func (v *Vertice) SwapEdgeVertice(whom, toWhom *Vertice, indexer Indexer) *Verti
 type EdgeDirection string
 
 const (
-	EDGE_TO   EdgeDirection = "to"
-	EDGE_FROM EdgeDirection = "from"
+	EDGE_TO    EdgeDirection = "to"
+	EDGE_FROM  EdgeDirection = "from"
+	EDGE_UNDIR EdgeDirection = "undirectional"
 )
 
 // Graph edge
@@ -301,4 +310,10 @@ func (e *Edge) SetWeight(w int) *Edge {
 // Get weight
 func (e *Edge) GetWeight() int {
 	return e.Weight
+}
+
+// If two edges are the same
+func IsEdgeEqual(a, b *Edge, indexer Indexer) bool {
+	return a.GetDirection() == b.GetDirection() &&
+		indexer.Equal(a.GetAttach(), b.GetAttach())
 }
