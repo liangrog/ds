@@ -1,13 +1,5 @@
 package graph
 
-type Indexer interface {
-	// Returns -1 if not found
-	Find(hay []*Vertice, niddle *Vertice) int
-
-	// If two vertices are the same
-	Equal(a, b *Vertice) bool
-}
-
 // Simple indexer for vertice value is a string
 type StringValueIndexer string
 

@@ -8,21 +8,116 @@ const (
 	workerMax = 100
 )
 
+// Indicate if graph is directed or undirected
+type GraphType string
+
+const (
+	// Directed: all edges have direction
+	DIRECTED GraphType = "directed"
+
+	// Undirected: Edge has no direction.
+	// But here we use edge has both directions
+	// to simulate it
+	UNDIRECTED GraphType = "undirected"
+)
+
 // The graph that holds all the vertices.
 // The vertice can have identities, it depends
 // How indexer is implemented.
 type Graph struct {
-	// All vertices belong to the graph.
-	Vertices []*Vertice
+	// Type of Graph
+	Type GraphType
 
-	// Graph indices.
-	Indexer Indexer
+	// Vertices are provided by a type of Store that
+	// persists all the vertices
+	Vertices Store
+
+	// Graph options, provide extensibility
+	Options map[string]interface{}
 }
 
-// Constructor.
-// Minimum one indexer is requre.
-func NewGraph(idxr Indexer) *Graph {
-	return &Graph{Indexer: idxr}
+// Graph constructor.
+func NewGraph(typ GraphType, store Store, options ...map[string]interface{}) *Graph {
+	var opts map[string]interface{}
+
+	// Merge options
+	if len(options) > 0 {
+		for _, o := range options {
+			for k, v := range o {
+				opts[k] = v
+			}
+		}
+	}
+
+	return &Graph{
+		Type:     typ,
+		Vertices: store,
+		Options:  opts,
+	}
+}
+
+// Add a vertice to graph
+func (g *Graph) AddVertice(v *Vertice) error {
+	err := g.Vertices.Add(v, g.Options)
+
+	// Update existing vertices that referring
+	// to the new vertice so to provide redundancy
+	if err != nil {
+		return g.AddVerticeReference(v)
+	}
+
+	return err
+}
+
+// Delete a vertice from graph by identifier
+func (g *Graph) DeleteVertice(key interface{}) error {
+	return g.Vertices.Delete(key, g.Options)
+}
+
+// Update object in graph
+func (g *Graph) UpdateVertice(v *Vertice) error {
+	return g.Vertices.Update(v, g.Options)
+}
+
+// Query object(s) for graph
+func (g *Graph) Query(filters ...interface{}) []*Vertice {
+	return g.Vertices.Query(filters...)
+}
+
+// Add Edge to the vertices that reference the given vertice
+func (g *Graph) AddVeticeReference(v *Vertice) error {
+	// Loop through the new vertice edges so
+	// we can update related vertices` edges
+	for e := range v.Edges.Iter() {
+		newEdge := new(Edge).
+			SetWeight(e.Weight).
+			SetAttach(v)
+
+		// Default direction
+		switch e.GetDirection() {
+		case EDGE_FROM:
+			newEdge.SetDirection(EDGE_TO)
+		case EDGE_TO:
+			newEdge.SetDirection(EDGE_FROM)
+		default:
+			newEdge.SetDirection(EDGE_UNDIR)
+		}
+
+		refVertice := e.GetAttach()
+		edgeExist := false
+		for _, ee := range refVertice.Edges {
+			if IsEdgeEqual(ee, newEdge, g.Indexer) {
+				edgeExist = true
+				break
+			}
+		}
+
+		if !edgeExist {
+			refVertice.Edges = append(refVertice.Edges, newEdge)
+		}
+	}
+
+	return g
 }
 
 // Remove all edges in the Vertices refering to the given vertice
@@ -75,42 +170,6 @@ func (g *Graph) RemoveVeticeEdgeReference(v *Vertice) {
 	close(vs)
 
 	wg.Wait()
-}
-
-// Add Edge to the vertices that reference the givenn vertice
-func (g *Graph) AddVeticeEdgeReference(v *Vertice) *Graph {
-	// Loop through the new vertice edges so
-	// we can update related vertices` edges
-	for _, e := range v.Edges {
-		newEdge := new(Edge).
-			SetWeight(e.Weight).
-			SetAttach(v)
-
-		// Default direction
-		switch e.GetDirection() {
-		case EDGE_FROM:
-			newEdge.SetDirection(EDGE_TO)
-		case EDGE_TO:
-			newEdge.SetDirection(EDGE_FROM)
-		default:
-			newEdge.SetDirection(EDGE_UNDIR)
-		}
-
-		refVertice := e.GetAttach()
-		edgeExist := false
-		for _, ee := range refVertice.Edges {
-			if IsEdgeEqual(ee, newEdge, g.Indexer) {
-				edgeExist = true
-				break
-			}
-		}
-
-		if !edgeExist {
-			refVertice.Edges = append(refVertice.Edges, newEdge)
-		}
-	}
-
-	return g
 }
 
 // Add or replace the given vertice
@@ -170,7 +229,7 @@ type Vertice struct {
 	// on both from vertice and to vertice
 	// so there is no traverse required for
 	// looking up for parent or child.
-	Edges []*Edge
+	Edges Store
 }
 
 // Set vertice value
