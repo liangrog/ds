@@ -2,99 +2,67 @@ package graph
 
 import (
 	"fmt"
-	"testing"
-
+	"github.com/liangrog/ds/graph/list"
+	"github.com/liangrog/ds/graph/parts"
+	"github.com/liangrog/ds/graph/sort"
 	_ "github.com/stretchr/testify/assert"
+	"testing"
 )
 
-func SimpleGraph() *Graph {
-	indexer := StringValueIndexer("name")
-	a := new(Vertice).SetValue("a")
-	b := new(Vertice).SetValue("b")
-	c := new(Vertice).SetValue("c")
-	d := new(Vertice).SetValue("d")
-	e := new(Vertice).SetValue("e")
+func TestCreateGraph(t *testing.T) {
+	g := parts.NewGraph(parts.DIRECTED, list.NewVerticeStore())
+	v1 := parts.NewVertice("v1", list.NewEdgeStore())
+	v2 := parts.NewVertice("v2", list.NewEdgeStore())
 
-	a.AddEdge(EDGE_TO, b, indexer)
-	a.AddEdge(EDGE_TO, c, indexer)
+	// First node has no edge
+	g.AddVertice(v1)
 
-	b.AddEdge(EDGE_TO, d, indexer)
-	b.AddEdge(EDGE_FROM, a, indexer)
-
-	d.AddEdge(EDGE_FROM, b, indexer)
-	e.AddEdge(EDGE_FROM, b, indexer)
-
-	graph := NewGraph(indexer).
-		UpsertVertice(a).
-		UpsertVertice(b).
-		UpsertVertice(c).
-		UpsertVertice(d).
-		UpsertVertice(e)
-
-	//
-	d.AddEdge(EDGE_FROM, c, indexer)
-	graph.UpsertVertice(d)
-	return graph
-}
-
-func SimpleNoDirGraph() *Graph {
-	indexer := StringValueIndexer("name")
-	a := new(Vertice).SetValue("a")
-	b := new(Vertice).SetValue("b")
-	c := new(Vertice).SetValue("c")
-	d := new(Vertice).SetValue("d")
-	e := new(Vertice).SetValue("e")
-
-	a.AddEdge(EDGE_UNDIR, b, indexer)
-	a.AddEdge(EDGE_UNDIR, c, indexer)
-
-	b.AddEdge(EDGE_UNDIR, d, indexer)
-	b.AddEdge(EDGE_UNDIR, a, indexer)
-
-	d.AddEdge(EDGE_UNDIR, b, indexer)
-	e.AddEdge(EDGE_UNDIR, b, indexer)
-
-	graph := NewGraph(indexer).
-		UpsertVertice(a).
-		UpsertVertice(b).
-		UpsertVertice(c).
-		UpsertVertice(d).
-		UpsertVertice(e)
-
-	//
-	d.AddEdge(EDGE_UNDIR, c, indexer)
-	graph.UpsertVertice(d)
-	return graph
-}
-
-func TestSearchVertice(t *testing.T) {
-	g := SimpleGraph()
-	for i, v := range g.Vertices {
-		fmt.Println("== ", i, v.GetValue())
-		for _, e := range v.Edges {
-			fmt.Println(e.GetDirection(), e.GetAttach().GetValue())
-		}
+	e2 := parts.NewEdge("e2", v1, parts.TO)
+	v2.AddEdge(e2)
+	if err := g.AddVertice(v2); err != nil {
+		fmt.Println(err)
 	}
 
-	fmt.Println("+++++++++++++++")
+	v3 := parts.NewVertice("v3", list.NewEdgeStore())
+	e1 := parts.NewEdge("e1", v1, parts.FROM)
+	v3.AddEdge(e1)
+	if err := g.AddVertice(v3); err != nil {
+		fmt.Println(err)
+	}
 
-	v, err := Kahn(g)
+	v4 := parts.NewVertice("v4", list.NewEdgeStore())
+	e4 := parts.NewEdge("e4", v3, parts.TO)
+	v4.AddEdge(e4)
+	if err := g.AddVertice(v4); err != nil {
+		fmt.Println(err)
+	}
+
+	v5 := parts.NewVertice("v5", list.NewEdgeStore())
+	e52 := parts.NewEdge("e52", v2, parts.FROM)
+	v5.AddEdge(e52)
+	e53 := parts.NewEdge("e53", v3, parts.FROM)
+	v5.AddEdge(e53)
+	if err := g.AddVertice(v5); err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("%s", g)
+
+	cyclic, res, err := sort.Kahn(g)
 
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	if v != nil {
-		for _, vv := range v {
-			fmt.Println(vv.GetValue())
-		}
-	}
+	fmt.Println(cyclic)
+
+	fmt.Printf("%s\n", res)
+
 	/*
-		for i, v := range SimpleNoDirGraph().Vertices {
-			fmt.Println("++ ", i, v.GetValue())
-			for _, e := range v.Edges {
-				fmt.Println(e.GetDirection(), e.GetAttach().GetValue())
-			}
+		if err := g.DeleteVertice(v3); err != nil {
+			fmt.Println(err)
 		}
 	*/
+	fmt.Printf("%s", g)
+
 }
