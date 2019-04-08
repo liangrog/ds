@@ -12,6 +12,7 @@ func Kahn(gh *parts.Graph) (bool, []*parts.Vertice, error) {
 	var sorted []*parts.Vertice
 
 	isCyclic := false
+
 	g := gh.DeepCopy()
 	if g.Type == parts.UNDIRECTED {
 		return isCyclic, sorted, errors.New("Kahn sort cannot sort an undirected graph")

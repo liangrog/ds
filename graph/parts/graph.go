@@ -140,7 +140,7 @@ func (g *Graph) DeleteVertice(v *Vertice) error {
 func (g *Graph) String() string {
 	var strOut string
 	strOut += fmt.Sprintf("Graph Type: %s, Total Vertices(%d)\n\n", g.Type, g.Vertices.Total())
-	strOut += fmt.Sprintf("%s\n", g.Vertices.String())
+	strOut += fmt.Sprintf("%s\n", g.Vertices)
 
 	return strOut
 }

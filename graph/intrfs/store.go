@@ -8,5 +8,6 @@ type Store interface {
 	// Delete an object for store
 	Delete(obj interface{}, options ...map[string]interface{}) error
 
+	// String presentation of the store
 	String() string
 }
