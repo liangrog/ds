@@ -1,20 +1,18 @@
 package parts
 
-// Vertice for the graph
+// Vertice for the graph.
 type Vertice struct {
-	// Value can be anything user defined
+	// Value can be anything user defined by using Value struct.
 	Value *Value
 
 	// All edges that come from or
 	// go out to from this vertice.
 	// Note each edge is referenced by
-	// both from vertice and to vertice
-	// so there is no traverse required for
-	// looking up for parent or child.
+	// both from vertice and to vertice.
 	Edges EdgeStore
 }
 
-// Vertice constructor
+// Vertice constructor.
 func NewVertice(value interface{}, edgeStore EdgeStore) *Vertice {
 	return &Vertice{
 		Value: NewValue(value),
@@ -22,7 +20,7 @@ func NewVertice(value interface{}, edgeStore EdgeStore) *Vertice {
 	}
 }
 
-// Delete all edge reference to a neighbor vertice
+// Delete edge reference to a neighboring vertice.
 func (v *Vertice) DeleteNeighborRef(neighbor *Vertice) error {
 	for e := range v.Edges.IterChan() {
 		if e.Neighbor.Value.Id() == neighbor.Value.Id() {
@@ -35,6 +33,7 @@ func (v *Vertice) DeleteNeighborRef(neighbor *Vertice) error {
 	return nil
 }
 
+// Get all neighboring vertices.
 func (v *Vertice) GetNeighbors() []*Vertice {
 	var res []*Vertice
 	for e := range v.Edges.IterChan() {
@@ -44,14 +43,17 @@ func (v *Vertice) GetNeighbors() []*Vertice {
 	return res
 }
 
+// Add an edge to vertice.
 func (v *Vertice) AddEdge(e *Edge) error {
 	return v.Edges.Add(e)
 }
 
+// Delete an edge to vertice.
 func (v *Vertice) DeleteEdge(e *Edge) error {
 	return v.Edges.Delete(e)
 }
 
+// If vertice only has type TO edges, which means it's a parent to other vertices only.
 func (v *Vertice) IsParentOnly() bool {
 	for e := range v.Edges.IterChan() {
 		if e.Type == FROM {
@@ -62,6 +64,7 @@ func (v *Vertice) IsParentOnly() bool {
 	return true
 }
 
+// If vertice only has type FROM edges, which means it's a child of other vertices only.
 func (v *Vertice) IsChildOnly() bool {
 	for e := range v.Edges.IterChan() {
 		if e.Type == TO {
@@ -72,6 +75,7 @@ func (v *Vertice) IsChildOnly() bool {
 	return true
 }
 
+// Compare two vertices based on value internal ID.
 func (v *Vertice) Equal(double *Vertice) bool {
 	return v.Value.Id() == double.Value.Id()
 }

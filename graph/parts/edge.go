@@ -3,31 +3,29 @@ package parts
 type EdgeType string
 
 const (
-	// Vertice is origin
+	// Vertice is origin.
 	FROM EdgeType = "from"
 
-	// Vertice is reciever
+	// Vertice is reciever.
 	TO EdgeType = "to"
 
-	// No direction
+	// No direction.
 	NODIR EdgeType = "nodir"
 )
 
-// Graph edge
+// Graph edge struct.
 type Edge struct {
-	// Edge value
+	// Edge value.
 	Value *Value
 
-	// The vertice that the
-	// current associated vertice
-	// connects to
+	// The neighboring vertice connected to.
 	Neighbor *Vertice
 
-	// Same as graph type
+	// Edge type.
 	Type EdgeType
 }
 
-// Edge constructor
+// Edge constructor.
 func NewEdge(value interface{}, v *Vertice, typ EdgeType) *Edge {
 	return &Edge{
 		Value:    NewValue(value),
@@ -36,9 +34,7 @@ func NewEdge(value interface{}, v *Vertice, typ EdgeType) *Edge {
 	}
 }
 
-// If given edge has the same
-// information as current edge.
-// NOTE: It ignores the edge value.
+// Compare two edges based on value internal ID and edge type.
 func (e *Edge) Equal(double *Edge) bool {
 	return e.Neighbor.Value.Id() == double.Neighbor.Value.Id() &&
 		e.Type == double.Type

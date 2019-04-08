@@ -1,5 +1,6 @@
 /*
 This package contains the core interfaces for
-the graph lib
+the graph library.
 */
+
 package intrfs

@@ -8,6 +8,8 @@ import (
 	"github.com/liangrog/ds/graph/parts"
 )
 
+var _ parts.EdgeStore = &EdgeStore{}
+
 // Edge store for vertice
 type EdgeStore struct {
 	lock sync.RWMutex

@@ -1,4 +1,3 @@
-// Graph holds all vertices references
 package parts
 
 import (
@@ -7,31 +6,27 @@ import (
 	"github.com/liangrog/ds/graph/utils"
 )
 
-// Indicate if graph is directed or undirected
+// Graph type can be directed or undirected.
 type GraphType string
 
 const (
-	// Directed: all edges have direction
+	// Directed: all edges have direction.
 	DIRECTED GraphType = "directed"
 
 	// Undirected: Edge has no direction.
-	// But here we use edge has both directions
-	// to simulate it
 	UNDIRECTED GraphType = "undirected"
 )
 
 // The graph that holds all the vertices references.
-// The vertice can have identities, it depends
-// How Store indexer is implemented.
 type Graph struct {
-	// Type of Graph
+	// Type of Graph.
 	Type GraphType
 
 	// Vertices are provided by a type of Store that
-	// persists all the vertices
+	// persists all the vertices.
 	Vertices VerticeStore
 
-	// Graph options, provide extensibility
+	// Graph options, provide extensibility and future use.
 	Options map[string]interface{}
 }
 
@@ -55,7 +50,14 @@ func NewGraph(typ GraphType, store VerticeStore, options ...map[string]interface
 	}
 }
 
-// Add a vertice to graph
+// Add a vertice to graph. This function will trigger an
+// update on all neighboring vertices, making sure the new
+// edge will be added to all neighboring vertices. The fact
+// that both vertices hold the same edge information will
+// reduce number of travers/search required.
+//
+// Caution: This is NOT a commit, so any erros could potentially
+// cause edge reference out of sync.
 func (g *Graph) AddVertice(v *Vertice) error {
 	// Add new vertice to store
 	if err := g.Vertices.Add(v, g.Options); err != nil {
@@ -65,7 +67,7 @@ func (g *Graph) AddVertice(v *Vertice) error {
 	// Error result for edge add
 	edgeRes := make(chan error)
 
-	// Update all assocaited vertices
+	// Update all neighboring vertices
 	go func() {
 		// Close result channel
 		defer close(edgeRes)
@@ -102,9 +104,8 @@ func (g *Graph) AddVertice(v *Vertice) error {
 	return nil
 }
 
-// Delete vertice from graph
-// Delete perform the oppsite order to add:
-// Delete edge reference first then the vertice.
+// Delete a vertice from graph.
+// This function is similar to `AddVertice`. The same caution should be noted.
 func (g *Graph) DeleteVertice(v *Vertice) error {
 	verRes := make(chan error)
 
@@ -137,6 +138,7 @@ func (g *Graph) DeleteVertice(v *Vertice) error {
 	return nil
 }
 
+// String presentation of the graph.
 func (g *Graph) String() string {
 	var strOut string
 	strOut += fmt.Sprintf("Graph Type: %s, Total Vertices(%d)\n\n", g.Type, g.Vertices.Total())
@@ -145,6 +147,7 @@ func (g *Graph) String() string {
 	return strOut
 }
 
+// Perform a deep copy of the graph.
 func (g *Graph) DeepCopy() *Graph {
 	return &Graph{
 		Type:     g.Type,

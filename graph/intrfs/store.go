@@ -1,6 +1,6 @@
 package intrfs
 
-// Store interface
+// Underlyinng vertices and edges store interface
 type Store interface {
 	// Add objct to store
 	Add(obj interface{}, options ...map[string]interface{}) error

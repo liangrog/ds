@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	// Maximum go routine number.
 	WAITMAX = 1000
 )
 
