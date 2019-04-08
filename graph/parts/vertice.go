@@ -1,7 +1,6 @@
 /*
 blahalasdjfaklsjfdklsafjalksj
 */
-
 package parts
 
 // Vertice for the graph.
