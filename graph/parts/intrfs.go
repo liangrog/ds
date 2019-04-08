@@ -13,6 +13,9 @@ type VerticeChanIterator interface {
 	Total() int
 }
 
+// Search function for Vertice.
+type VerticeSearchFunc = func(*Vertice) bool
+
 // Vertice store interface.
 type VerticeStore interface {
 	// Pop the last vertice stored in the store.
@@ -23,6 +26,12 @@ type VerticeStore interface {
 
 	// Deep copy the store.
 	DeepCopy() VerticeStore
+
+	// Get vertice by given id
+	Get(id string) *Vertice
+
+	// Get vertice by function
+	GetByFunc(f VerticeSearchFunc) *Vertice
 
 	// Store interface.
 	intrfs.Store

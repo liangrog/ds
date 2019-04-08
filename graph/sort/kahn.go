@@ -8,11 +8,19 @@ import (
 	"github.com/liangrog/ds/graph/utils"
 )
 
+// Kahn sorting algorithm for graph. It uses list store for storing vertices.
+// This function will make a deep copy of the graph. So be cautious if your
+// graph is big as it will consume double the memory.
+//
+// It returs three values. The `bool` value is used for if the graph is cyclic.
+// The second value is the sorted list of the vertices. The error returns as the
+// third value.
 func Kahn(gh *parts.Graph) (bool, []*parts.Vertice, error) {
 	var sorted []*parts.Vertice
 
 	isCyclic := false
 
+	// Make a copy of graph so we won't change the original.
 	g := gh.DeepCopy()
 	if g.Type == parts.UNDIRECTED {
 		return isCyclic, sorted, errors.New("Kahn sort cannot sort an undirected graph")
@@ -24,6 +32,7 @@ func Kahn(gh *parts.Graph) (bool, []*parts.Vertice, error) {
 		return isCyclic, sorted, err
 	}
 
+	// Perform Kahn
 	for pList.Total() > 0 {
 		v := pList.Pop()
 		sorted = append(sorted, v)
@@ -38,6 +47,7 @@ func Kahn(gh *parts.Graph) (bool, []*parts.Vertice, error) {
 		v.Edges.Empty()
 	}
 
+	// Check if graph cyclic
 	for v := range g.Vertices.IterChan() {
 		if v.Edges.Total() > 0 {
 			isCyclic = true
@@ -48,9 +58,7 @@ func Kahn(gh *parts.Graph) (bool, []*parts.Vertice, error) {
 	return isCyclic, sorted, nil
 }
 
-// Go through the graph looking for
-// vertices that only have the source
-// edge.
+// Go through the graph looking for vertices that has no incoming edges.
 func GetParentOnlyVertices(g *parts.Graph) (*list.VerticeStore, error) {
 	s := list.NewVerticeStore()
 	res := make(chan error)

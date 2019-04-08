@@ -12,22 +12,24 @@ var _ parts.EdgeStore = &EdgeStore{}
 
 // Edge store for vertice
 type EdgeStore struct {
+	// Thread safe lock
 	lock sync.RWMutex
 
 	// Items stored in the list
 	Items []*parts.Edge
 
+	// Indexer for teh store
 	Indexer *EdgeIndexer
 }
 
-// Vertice store constructor
+// Edge store constructor
 func NewEdgeStore() *EdgeStore {
 	return &EdgeStore{
 		Indexer: NewEdgeIndexer(),
 	}
 }
 
-// Override
+// Iterator. Returns each vertice
 func (l *EdgeStore) IterChan() chan *parts.Edge {
 	ch := make(chan *parts.Edge)
 
@@ -48,22 +50,25 @@ func (l *EdgeStore) IterChan() chan *parts.Edge {
 	return ch
 }
 
-// ChannelIterator implementation
+// Iterator. Returns total edge number.
 func (l *EdgeStore) Total() int {
 	return len(l.Items)
 }
 
+// Empty the list.
 func (l *EdgeStore) Empty() {
 	var newList []*parts.Edge
 	l.Items = newList
 }
 
+// Pop the last edge in the list.
 func (l *EdgeStore) Pop() *parts.Edge {
 	x := l.Items[len(l.Items)-1]
 	l.Items = l.Items[:len(l.Items)-1]
 	return x
 }
 
+// Store string presentation.
 func (l *EdgeStore) String() string {
 	var strOut string
 	for _, e := range l.Items {
@@ -73,7 +78,7 @@ func (l *EdgeStore) String() string {
 	return strOut
 }
 
-// Add object to list
+// Add Vertice to store. It won't add if it's existed. This function is thread safe.
 func (l *EdgeStore) Add(obj interface{}, options ...map[string]interface{}) error {
 	edge, ok := obj.(*parts.Edge)
 	if !ok {
@@ -91,7 +96,7 @@ func (l *EdgeStore) Add(obj interface{}, options ...map[string]interface{}) erro
 	return nil
 }
 
-// Delete object from list
+// Delete edge from store. It's thread safe.
 func (l *EdgeStore) Delete(obj interface{}, options ...map[string]interface{}) error {
 	edge, ok := obj.(*parts.Edge)
 	if !ok {
@@ -109,4 +114,24 @@ func (l *EdgeStore) Delete(obj interface{}, options ...map[string]interface{}) e
 
 	}
 	return nil
+}
+
+// Indexer for edge store.
+type EdgeIndexer struct {
+}
+
+// Edge indexer constructor.
+func NewEdgeIndexer() *EdgeIndexer {
+	return &EdgeIndexer{}
+}
+
+// Find an index for an edge from list. If not found, returns -1.
+func (idxr *EdgeIndexer) Find(l *EdgeStore, e *parts.Edge) int {
+	for idx, val := range l.Items {
+		if val.Equal(e) {
+			return idx
+		}
+	}
+
+	return -1
 }

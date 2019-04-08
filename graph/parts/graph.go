@@ -104,6 +104,11 @@ func (g *Graph) AddVertice(v *Vertice) error {
 	return nil
 }
 
+// Update a vertice.
+func (g *Graph) UpdateVertice(v *Vertice) error {
+	return g.AddVertice(v)
+}
+
 // Delete a vertice from graph.
 // This function is similar to `AddVertice`. The same caution should be noted.
 func (g *Graph) DeleteVertice(v *Vertice) error {
@@ -154,4 +159,22 @@ func (g *Graph) DeepCopy() *Graph {
 		Options:  g.Options,
 		Vertices: g.Vertices.DeepCopy(),
 	}
+}
+
+// Find vertice by it's internal ID.
+func (g *Graph) GetVerticeById(id string) *Vertice {
+	if found := g.Vertices.Get(id); found != nil {
+		return found
+	}
+
+	return nil
+}
+
+// Find vertice by user provided function.
+func (g *Graph) GetVerticeByFunc(f VerticeSearchFunc) *Vertice {
+	if found := g.Vertices.GetByFunc(f); found != nil {
+		return found
+	}
+
+	return nil
 }
