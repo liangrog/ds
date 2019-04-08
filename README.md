@@ -1,2 +1,2 @@
 # ds
-Data structures for go
+Non-native data structure implementations for go
