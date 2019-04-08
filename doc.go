@@ -1,6 +1,5 @@
 /*
 Data structure module.
-
 */
 package ds
 
