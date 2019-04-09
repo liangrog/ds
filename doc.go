@@ -1,6 +1,6 @@
 // Package ds provides data structures that are not implemented by Go's built-in library.
 //
-// 1. Graph
+// Graph
 //
 // The graph module provides functions and utilities to construct a graph. It also allows flexible
 // extension to the library using which developers can construct custom stores, algorithms or custom
@@ -9,17 +9,20 @@
 // Below is an example of create a three nodes grph using built-in list store.
 //
 // Notes:
+//
 // 1. Any changes to the vertices or edges will need to call UpdateVertice to trigger the graph update.
+//
 // 2. Vertices needed to be exist in the graph if being referennced by another vertice.
+//
 // 3. Only one edge reference required when adding a new vertice. The AddVertice/UpdateVertice function
 // will automatically add the opposite reference to the neighboring vertices. For example, we have
 // vertice A and B, only edge A=>B with TO type needed to added to A, after calling the add or update
 // function, A=>B with From type will be automatically added to vertice B.
 //
-// 	 package main
+//   package main
 //
-// 	 import (
-//	   "fmt"
+//   import (
+//     "fmt"
 //
 //     "github.com/liangrog/ds/graph/parts"
 //     "github.com/liangrog/ds/graph/list"
@@ -27,7 +30,7 @@
 //
 //   func main() {
 //     // Create a directed graph
-//	   g := parts.NewGraph(parts.DIRECTED, list.NewVerticeStore())
+//     g := parts.NewGraph(parts.DIRECTED, list.NewVerticeStore())
 //
 //     // Create three vertices
 //     v1 := parts.NewVertice("1", list.NewEdgeStore())
@@ -50,7 +53,7 @@
 //     v2.AddEdge(e23)
 //     g.UpdateVertice(v2)
 //
-//	   fmt.Printf("%s", g)
+//     fmt.Printf("%s", g)
 //
 //     // Let's Kahn sort it
 //     _, sorted, _ = sort.Kahn(g)
