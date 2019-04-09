@@ -48,6 +48,11 @@ func (v *Vertice) AddEdge(e *Edge) error {
 	return v.Edges.Add(e)
 }
 
+// Update an edge to vertice.
+func (v *Vertice) UpdateEdge(e *Edge) error {
+	return v.Edges.Add(e)
+}
+
 // Delete an edge to vertice.
 func (v *Vertice) DeleteEdge(e *Edge) error {
 	return v.Edges.Delete(e)
