@@ -2,7 +2,6 @@
 Package ds provides data structures that are not implemented by Go's built-in library.
 
 ## Documentations
-Please see the package [godoc](https://godoc.org/github.com/liangrog/ds)
 Please see the package [![GoDoc](https://godoc.org/github.com/liangrog/ds?status.svg)](https://godoc.org/github.com/liangrog/ds)
 
 ## Example
