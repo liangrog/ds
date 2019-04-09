@@ -5,6 +5,7 @@ Package ds provides data structures that are not implemented by Go's built-in li
 Please see the package [godoc](https://godoc.org/github.com/liangrog/ds)
 
 ## Example
+Graph
 ```go
 package main
 
