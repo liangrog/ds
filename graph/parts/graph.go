@@ -2,8 +2,7 @@ package parts
 
 import (
 	"fmt"
-
-	"github.com/liangrog/ds/graph/utils"
+	"sync"
 )
 
 // Graph type can be directed or undirected.
@@ -72,8 +71,9 @@ func (g *Graph) AddVertice(v *Vertice) error {
 		// Close result channel
 		defer close(edgeRes)
 
-		wg := utils.GetWait(v.Edges.Total())
+		var wg sync.WaitGroup
 		for e := range v.Edges.IterChan() {
+			wg.Add(1)
 			go func(edge *Edge) {
 				// the other related vertice
 				var t EdgeType
@@ -118,8 +118,9 @@ func (g *Graph) DeleteVertice(v *Vertice) error {
 		// Close result channel
 		defer close(verRes)
 
-		wg := utils.GetWait(v.Edges.Total())
+		var wg sync.WaitGroup
 		for e := range v.Edges.IterChan() {
+			wg.Add(1)
 			go func(edge *Edge) {
 				verRes <- edge.Neighbor.DeleteNeighborRef(v)
 				wg.Done()

@@ -2,10 +2,10 @@ package sort
 
 import (
 	"errors"
+	"sync"
 
 	"github.com/liangrog/ds/graph/list"
 	"github.com/liangrog/ds/graph/parts"
-	"github.com/liangrog/ds/graph/utils"
 )
 
 // Kahn sorting algorithm for graph. It uses list store for storing vertices.
@@ -64,8 +64,10 @@ func GetParentOnlyVertices(g *parts.Graph) (*list.VerticeStore, error) {
 	res := make(chan error)
 	go func() {
 		defer close(res)
-		wg := utils.GetWait(g.Vertices.Total())
+
+		var wg sync.WaitGroup
 		for v := range g.Vertices.IterChan() {
+			wg.Add(1)
 			go func(vertice *parts.Vertice) {
 				if vertice.IsParentOnly() {
 					err := s.Add(vertice)

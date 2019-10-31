@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"github.com/liangrog/ds/graph/parts"
-	"github.com/liangrog/ds/graph/utils"
 )
 
 var _ parts.VerticeStore = &VerticeStore{}
@@ -68,8 +67,9 @@ func (l *VerticeStore) DeepCopy() parts.VerticeStore {
 	}
 
 	// Replicated all edges.
-	wg := utils.GetWait(l.Total())
+	var wg sync.WaitGroup
 	for v := range l.IterChan() {
+		wg.Add(1)
 		go func(old *parts.Vertice) {
 			// Find match new vertice
 			vv := cp.Items[cp.Indexer.Find(cp, old)]
