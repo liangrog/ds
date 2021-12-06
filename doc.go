@@ -75,4 +75,5 @@ import (
 	_ "github.com/liangrog/ds/graph/parts"
 	_ "github.com/liangrog/ds/graph/sort"
 	_ "github.com/liangrog/ds/graph/utils"
+	_ "github.com/liangrog/ds/utils"
 )
